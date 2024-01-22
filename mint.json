@@ -58,9 +58,10 @@
       "pages": ["essentials/markdown", "essentials/code", "essentials/images", "essentials/settings", "essentials/navigation"]
     },
     {
-      "group": "API Documentation",
-      "pages": ["api-reference/introduction"]
+      "group": "Documentation",
+      "pages": ["documentation/overview", "documentation/get-Started", "documentation/speech-and-Visual-Concepts",  "documentation/LLM-Concepts", "documentation/Action-Taking-Agents"]
     },
+  
     {
       "group": "Endpoint Examples",
       "pages": [
