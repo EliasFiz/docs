@@ -1,0 +1,197 @@
+## Action Taking Agents
+<p>
+Agents can take actions like retrieve data, manipulate data in a database, and much more. In fact,
+anything that can be captured by an API call is a good foundation for an agent's capabilities.
+</p>
+Instructions for actions are embedded into the dialogues that the AI produces. We recommend you use `gpt-4-turbo` for agents that need to take actions. 
+
+<p>Lets work through a simple example.</p>
+<p> First lets come up with some simple actions that an agent could take. We are going to pretend that the agent can subscribe or delete users.</p>
+
+### Step 1: Initiate Actions with a System Message
+
+First we have to tell the LLM what actions they are allowed to take. Obviously, you can do this at any point in the conversation, but for simplicty, let's just do this in the `initialSystemMessage`:
+
+```javascript
+const CanopyConfig = {
+    model:"gpt-4-turbo", 
+    ...
+    baseAgentUrl:'https://yourserver.com/canopy/', // the point of this will be explained shortly
+    initialSystemMessage:
+    `You are a bot to help users manage their account.
+    You can take actions when you deem appropriate
+    in the following format:
+    
+    <action_id>
+        {
+            required data as json
+        }
+    </action_id>
+
+    You can take the following actions:
+
+    UPGRADE (to upgrade the user account). 
+
+    Call UPGRADE like this:
+    <UPGRADE> 
+        {
+            "email":"hi@canopyai.xyz", 
+            "tier":"premium" (options are "premium" or "pro")
+        }
+    </UPGRADE>
+    (and tell the user I'm currently upgrading your account)
+
+    DELETE (to delete the user account). 
+
+    Call DELETE like this:
+    <DELETE>
+        {
+            email:"hi@canopyai.xyz", 
+        }
+    </DELETE>
+    (and tell the user I'm currently deleting your account)
+
+    If you are missing information try to get the information before calling the action. 
+    `
+}
+const canopy = new Canopy(CanopyConfig)
+```
+
+<p> Now that you have told the LLM what actions it can take. Let's imagine a conversation may go like:</p>
+
+```javascript
+[
+    //with the system message above somewhere prior in the conversation
+    ...
+    {
+        role:"user", 
+        content:`hey I want to upgrade my account to premium`
+    }, 
+    {
+        role:"assistant", 
+        content:`Great! What is your email address?`
+    }, 
+    {
+        role:"user", 
+        content:`hi at canopy ai dot xyz`
+    }, 
+    {
+        role:"assistant", 
+        content:`
+        Thanks. I'm upgrading your account now.
+            <UPGRADE> 
+                {
+                    "email":"hi@canopyai.xyz", 
+                    "tier":"premium"
+                }
+            </UPGRADE> 
+        `
+    }
+    ...
+]
+```
+
+<p> At this point in the conversation, Canopy will parse the last dialogue and speak <em>Thanks. I'm upgrading your account now.</em></p>
+<p> It will simultaneously make a `POST` request to your `baseAgentUrl` (which you provided in `CanopyConfig`) with the json data provided in the `<ACTION>` object.</p>
+
+```javascript
+//POST request sent to https://yourserver.com/canopy with data
+
+{
+    "actionType":"UPGRADE", 
+    "actionData":{
+        "email":"hi@canopyai.xyz", 
+        "tier":"premium"
+    }
+}
+```
+You should have set up a server hosted at the `baseAgentUrl` which is ready to recieve these `POST` requests. 
+
+### Step 2: Respond to Actions (optional)
+
+You may optionally choose to respond to actions using the `CRUD` operations defined <a href="/documentation/llm-concepts">here</a>. For example, you may wish to tell the user they have insufficient credit to upgrade to premium. 
+In this case respond with JSON objects. 
+
+```json
+{
+    "actionResponseType":"AppendDialogue", 
+    "actionResponseData":{
+        "role": "system",
+        "content": "The user was unable to upgrade because they have insufficient credit. Tell them to buy more credit."
+    }
+}
+```
+Here you should use the key parameters `actionResponseType` which can be one of `ReadConversation`, `AppendDialogue`, `UpdateDialogue`, `DeleteDialogue` and the
+`actionResponseData` parameter which should pass the same data as defined earlier but in JSON form. 
+
+Now Canopy will add this message to the conversation so far and the conversation will continue in a full interactive way. Here is what the 
+`messageThread` may look like once this has happened. 
+
+```javascript
+
+[
+    //with the system message above somewhere prior in the conversation
+    ...
+    {
+        role:"user", 
+        content:`hey I want to upgrade my account to premium`
+    }, 
+    {
+        role:"assistant", 
+        content:`Great! What is your email address?`
+    }, 
+    {
+        role:"user", 
+        content:`hi at canopy ai dot xyz`
+    }, 
+    {
+        role:"assistant", 
+        content:`
+        Thanks. I'm upgrading your account now.
+            <UPGRADE> 
+                {
+                    "email":"hi@canopyai.xyz", 
+                    "tier":"premium"
+                }
+            </UPGRADE> 
+        `
+    }, 
+    {
+        role:"user", 
+        content:`Thank you, no rush!`
+    },
+    {
+        role:"system", 
+        content:`The user was unable to upgrade because they have insufficient credit. Tell them to buy more credit.`
+    },
+    {
+        role:"assistant", 
+        content:`Unfortunately, you don't have enough credit yet - you can buy some...`
+    },
+    ...
+]
+```
+
+## Tips and tricks
+Here are some helpful suggestions:
+- Use the provided template for action calling above - Canopy can only parse action data in the format shown with:
+```javascript
+<ACTION_ID>
+{
+   // ... action data as json ...
+}
+</ACTION_ID>
+```
+
+- Remember you can pass a user ID in the system message. You probably know which user is on your website and can identify them by a user id. 
+You do not need to ask the user to identify themselves most of the times:
+```javascript
+CanopyConfig = {
+    initialSystemMessage = `...
+                                // A list of actions that are user specific
+                                // so they use a userId parameter
+
+                                And also the users id (userId) is E2e9d3jd3d3 
+                            `
+}
+```
