@@ -1,0 +1,40 @@
+---
+title: 'canopy.updateDialogue'
+---
+
+<RequestExample>
+
+```javascript index.js
+await canopy.UpdateDialogue({
+    role: "system",
+    content: "Here is information from the database:...", 
+    dialogueIndex:4 // the index in the message thread array of this dialogue
+})
+```
+
+</RequestExample>
+
+Deletes a dialogue at a given `dialogueIndex` from the `messageThread`. More information 
+<a href="/documentation/LLM-Concepts#delete-dialogue"> here </a>.
+
+### Parameters
+<ParamField path="dialogueIndex" type="number" required="true">
+`dialogueIndex` must be less than the length of the `messageThread` array.
+</ParamField>
+<ParamField path="role" type="string" required="true">
+More information <a href="/documentation/LLM-Concepts"> here </a>.
+</ParamField>
+<ParamField path="content" type="string" required="true">
+</ParamField>
+
+### Response
+You will get a <b>JSON</b> response with the following fields:
+<ResponseField name="success" type="boolean">
+</ResponseField>
+<ResponseField name="timestamp" type="number">
+</ResponseField>
+<ResponseField name="messageThread" type="array">
+An array of objects, where each object is a `dialogue`.
+</ResponseField>
+
+
