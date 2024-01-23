@@ -1,0 +1,120 @@
+<p>
+This is a 2-Part tutorial. The first part is a quick guide to writing a good system message to teach your agent its instructions. 
+The second part is how to set up your server, to deal with these actions and send the necessary data back. 
+In this tutorial, we will be using the example of a clothing store, where users can search for items of clothing, subscribe to a newsletter, 
+cancel their subscription, and purchase clothes.
+</p>
+<Steps>
+  <Step title="Identify all POST Endpoints">
+    First you need to figure out all the `POST` endpoints that are used by the agent. We recommend you use up to 10, but the fewer the better. 
+    We also recommend you dynamically add `system dialogues` using the `AppendDialogue` endpoint depending on how the conversation is going. 
+
+    Let's say I have the following endpoints:
+    | Action | Required JSON |
+| -------- | -------------------------------------
+| `UNSUBSCRIBE`     |  `{"uid":"<6 digit string>", "reason":"<string> for why the user wants to unsubscribe"}`  |
+| `QUERY`     |  `{"reason":"<string> query string for clothing item you want to search for (i.e. small woolen red jumper)"}`  |
+| `SUBSCRIBE`     |`{"uid":"<6 digit code>", "subscription":"<string> 'weekly' or 'monthly'"}` |
+| `PURCHASE`     | `{"uid":"<6 digit code>", "itemId":"<string 6 digits starting>", "color":"<string> 'blue' or 'black', 'red', 'green', 'auburn'"}` |
+  </Step>
+  <Step title="Construct as Follows">
+Now create a system message of the following structure:
+
+### Introduce the Concept
+First tell outline to the bot what it is supposed to do. 
+
+```javascript
+`You are a bot designed to assist users in managing their interactions with our clothing store.
+You can take specific actions when necessary, using the following format:
+<ACTIONNAME>
+    {
+        "required data as JSON"
+    }
+</ACTIONNAME>
+You have the capability to perform the following actions:`
+```
+### List the Actions
+Then list the actions that the bot can take, and the required JSON for each action. Here is the
+format we recommend:
+
+
+```javascript
+`ACTIONNAME (short string about point of action).
+
+Call ACTIONNAME like this:
+<ACTIONNAME>
+    {
+        "required data as JSON String"
+    }
+</ACTIONNAME>
+(short string about point of action)`
+```
+
+### Putting This Together
+If we put this together, we get the following system message, for our clothing store:
+
+
+```javascript
+`You are a bot designed to assist users in managing their interactions with our clothing store.
+You can take specific actions when necessary, using the following format:
+
+<action_id>
+    {
+        required data as JSON
+    }
+</action_id>
+
+You have the capability to perform the following actions:
+
+UNSUBSCRIBE (to cancel a user's newsletter subscription).
+
+Call UNSUBSCRIBE like this:
+<UNSUBSCRIBE>
+    {
+        "uid":"<6 digit string>", 
+        "reason":"<string> for why the user wants to unsubscribe"
+    }
+</UNSUBSCRIBE>
+(and tell the user I'm currently processing your unsubscription, when you take this action)
+
+QUERY (to search for clothing items).
+
+Call QUERY like this:
+<QUERY>
+    {
+        "query":"<string> query string for clothing item you want to search for (i.e., small woolen red jumper)"
+    }
+</QUERY>
+(and tell the user I'm searching for your item, when you take this action)
+
+SUBSCRIBE (to subscribe a user to a newsletter).
+
+Call SUBSCRIBE like this:
+<SUBSCRIBE>
+    {
+        "uid":"<6 digit code>", 
+        "subscription":"<string> 'weekly' or 'monthly'"
+    }
+</SUBSCRIBE>
+(and tell the user I'm processing your subscription, when you take this action)
+
+PURCHASE (to process a clothing purchase).
+
+Call PURCHASE like this:
+<PURCHASE>
+    {
+        "uid":"<6 digit code>", 
+        "itemId":"<string 6 digits starting>", 
+        "color":"<string> 'blue' or 'black', 'red', 'green', 'auburn'"
+    }
+</PURCHASE>
+(and tell the user I'm processing your purchase, when you take this action)
+
+If any information is missing, try to gather the necessary details before initiating the action.`
+`
+    ```
+  </Step>
+
+</Steps>
+
+

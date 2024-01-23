@@ -1,0 +1,22 @@
+---
+title: 'canopy.listen'
+---
+
+<RequestExample>
+
+```javascript index.js
+document.addEventListener("click", ()=>{
+  canopy.listen()
+})
+```
+
+</RequestExample>
+This is to start the listener - which will now stream the user's audio to the server. 
+
+<Warning>Most browsers have a security feature that requires the user interact with the page before it can start listening for audio. 
+This means the `canopy.listen` method must be called in response to a browser event. </Warning>
+
+
+
+
+

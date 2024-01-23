@@ -1,0 +1,25 @@
+---
+title: 'canopy.visualise'
+---
+
+<RequestExample>
+
+```javascript index.js
+const canvas = document.getElementById('canvas')
+canopy.visualise(canvas)
+// or
+canopy.visualise()
+```
+
+</RequestExample>
+This is to turn on the visual side of your avatar. You can pass a canvas or let Canopy 
+create one for you. If you pass a canvas, it will be used to render the avatar.
+
+You can also style the canvas element using <b>CSS </b>.
+ 
+### Parameters
+<ParamField path="canvas" type="string"  >
+A DOM Node for a Canvas Element
+</ParamField>
+
+

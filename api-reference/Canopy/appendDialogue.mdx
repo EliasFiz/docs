@@ -1,0 +1,33 @@
+---
+title: 'canopy.appendDialogue'
+---
+
+<RequestExample>
+
+```javascript index.js
+const dialogue = {
+  role:"system", // or "user", "assistant" 
+  content:"Tell the user that they are nice"
+}
+canopy.appendDialogue(dialogue)
+```
+</RequestExample>
+
+
+You can add a dialogue to the end of the `messageThread`.
+
+### Parameters
+
+<ParamField path="dialogue" type="string" required="true">
+A dialogue must consist of a `role` and `content`. More information on allowed value can be found
+<a href="/documentation/LLM-Concepts#overview"> here </a>.
+</ParamField>
+### Response
+You will get a <b>JSON</b> response with the following fields:
+<ResponseField name="success" type="boolean">
+</ResponseField>
+<ResponseField name="timestamp" type="number">
+</ResponseField>
+<ResponseField name="messageThread" type="array">
+An array of objects, where each object is a `dialogue`.
+</ResponseField>

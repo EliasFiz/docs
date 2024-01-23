@@ -1,0 +1,233 @@
+## Receiving Actions
+
+Remember that Canopy parses the LLM output and POSTs to the `baseAgentUrl` the following
+format. 
+Make sure that you have passed the `baseAgentUrl` and `initialSystemMessage` in the CanopyConfig object, from the frontend,
+<a href="/documentation/action-taking-agents/guide#step-1-initiate-actions-with-a-system-message"> like here: </a>
+
+```json
+//POST request
+{
+    "actionType":"UPGRADE", 
+    "actionData":{
+        "email":"hi@canopyai.xyz", 
+        "tier":"premium"
+    }
+}
+```
+Now let's set up code to listen for these actions and respond accordingly. We are going to continue using the example
+from the <a href="/documentation/action-taking-agents/system-message"> previous section </a>
+
+<Steps>
+  <Step title="Install Required Packages">
+  <CodeGroup>
+
+```bash npm
+#We can use express to host our server
+npm install express
+```
+```bash pip
+#We can use flask to host our server
+pip install flask
+```
+
+
+</CodeGroup>
+
+  </Step>
+  <Step title="Starting Listening For Post Requests">
+  Now let's set up our server to listen for actions - here are a couple of examples in different languages.
+    <CodeGroup>
+```javascript index.js
+const express = require('express');
+const app = express();
+const port = 3000;
+app.use(express.json());
+
+async function handleAction(actionType, actionData) {
+    //we will make this function in the next step
+    console.log("handling action", actionType, actionData);
+
+    //sending back some placeholder data
+    return {actionResponseType: "SUCCESS", actionResponseData: {}};
+}
+
+app.post('/', async (req, res) => {
+
+    const { actionType, actionData } = req.body;
+    const {actionResponseType, actionResponseData} = await handleAction(actionType, actionData);
+
+    //You do not need to send actions back to the LLM
+    //But you can for more interactive experiences
+    res.send(JSON.stringify({actionResponseType, actionResponseData}));
+});
+
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+});
+```
+```python index.py
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+async def handleAction(actionType, actionData):
+    # We will make this function in the next step
+    print("Handling action", actionType, actionData)
+    # Placeholder for your action handling logic (next step)
+    return "responseType", "responseData"
+
+@app.route('/', methods=['POST'])
+async def index():
+    data = request.get_json()
+    actionType = data['actionType']
+    actionData = data['actionData']
+
+    actionResponseType, actionResponseData = await handleAction(actionType, actionData)
+
+    # You do not need to send actions back to the LLM
+    # But you can for more interactive experiences
+    return jsonify({'actionResponseType': actionResponseType, 'actionResponseData': actionResponseData})
+
+if __name__ == '__main__':
+    app.run(port=3000, debug=True)
+```
+</CodeGroup>
+
+  </Step>
+  <Step title="Writing the handleAction function">
+    We will now handle the action that we received from the LLM. 
+    We will just use a dummy response, but you should use this function to do what you want.
+
+    <p> If its unclear what the `actionType` and `actionData` are, please refer to the <a href="/documentation/action-taking-agents/guide#step-2-respond-to-actions-optional"> previous section </a> </p>
+
+    <CodeGroup>
+```javascript index.js
+async function handleAction(actionType, actionData) {
+    //lets write a switch statement to handle the different action types
+
+    switch (actionType) {
+        case "UNSUBSCRIBE":
+            const { uid, reason } = actionData;
+            //write code to unsubscribe the user from database
+            //send back a response
+            return {
+                actionResponseType: "AppendDialogue", 
+                actionResponseData: {
+                    "content": "The user has been successfully unsubscribed!", 
+                    "role":"system"
+                }
+            };
+      
+        case "QUERY":
+            const { query } = actionData;
+            //write code to query the database
+            //send back a response where the content is the result of the query
+            return {
+                actionResponseType: "AppendDialogue", 
+                actionResponseData: {
+                    "content": "The result of the query is: We have medium woolen jumpers in blue, red, and green. The item code is 123456.", 
+                    "role":"system"
+                }
+            };
+        case "SUBSCRIBE":
+            const { uid, subscription } = actionData;
+            return {
+                actionResponseType: "AppendDialogue", 
+                actionResponseData: {
+                    "content": "The user has been successfully subscribed!", 
+                    "role":"system"
+                }
+            };
+
+        case "PURCHASE":
+            const { uid, itemId, color } = actionData;
+            //write code to purchase the item
+            //send back a response
+            return {
+                actionResponseType: "AppendDialogue", 
+                actionResponseData: {
+                    "content": "The user's card was declined. Tell them to update their payment information.", 
+                    "role":"system"
+                }
+            };
+        default:
+            return {
+                actionResponseType: "AppendDialogue", 
+                actionResponseData: {
+                    "content": "That was an invalid or badly formatted action. Please format your action correctly: <ACTIONNAME>{actionType: string, actionData: object}</ACTIONNAME>. And only use provided actions.", 
+                    "role":"system"
+                }
+            };
+    }
+}
+
+```
+```python index.py
+async def handleAction(actionType, actionData):
+    # Handling different action types
+
+    if actionType == "UNSUBSCRIBE":
+        uid = actionData['uid']
+        reason = actionData['reason']
+        # Write code to unsubscribe the user from the database
+        # Send back a response
+        return {
+            "actionResponseType": "AppendDialogue",
+            "actionResponseData": {
+                "content": "The user has been successfully unsubscribed!",
+                "role": "system"
+            }
+        }
+
+    elif actionType == "QUERY":
+        query = actionData['query']
+        # Write code to query the database
+        # Send back a response where the content is the result of the query
+        return {
+            "actionResponseType": "AppendDialogue",
+            "actionResponseData": {
+                "content": "The result of the query is: We have medium woolen jumpers in blue, red, and green. The item code is 123456.",
+                "role": "system"
+            }
+        }
+
+    elif actionType == "SUBSCRIBE":
+        uid = actionData['uid']
+        subscription = actionData['subscription']
+        # Write code to handle subscription
+        return {
+            "actionResponseType": "AppendDialogue",
+            "actionResponseData": {
+                "content": "The user has been successfully subscribed!",
+                "role": "system"
+            }
+        }
+
+    elif actionType == "PURCHASE":
+        uid = actionData['uid']
+        itemId = actionData['itemId']
+        color = actionData['color']
+        # Write code to handle the purchase
+        # Send back a response
+        return {
+            "actionResponseType": "AppendDialogue",
+            "actionResponseData": {
+                "content": "The user's card was declined. Tell them to update their payment information.",
+                "role": "system"
+            }
+        }
+
+    else:
+        # Handling invalid or badly formatted actions
+        return {
+            "actionResponseType": "AppendDialogue",
+            "actionResponseData": {
+                "content": "That was an invalid or badly formatted action. Please format your action correctly: <ACTIONNAME>{actionType: string, actionData: object}</ACTIONNAME>. And only use provided actions.",
+                "role": "system"
+            }
+        }
+```
+    </CodeGroup>
+  </Step>
+</Steps>

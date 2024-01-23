@@ -10,7 +10,8 @@ Instructions for actions are embedded into the dialogues that the AI produces. W
 
 ### Step 1: Initiate Actions with a System Message
 
-First we have to tell the LLM what actions they are allowed to take. Obviously, you can do this at any point in the conversation, but for simplicty, let's just do this in the `initialSystemMessage`:
+First we have to tell the LLM what actions they are allowed to take. Obviously, you can do this at any point in the conversation, but for simplicty, let's just do this in the 
+<a href="/documentation/action-taking-agents/system-message">`initialSystemMessage`</a>. You can learn about how to write a great system message for agentic behaviour <a href="/documentation/action-taking-agents/system-message">here</a>.
 
 ```javascript
 const CanopyConfig = {
@@ -36,10 +37,10 @@ const CanopyConfig = {
     <UPGRADE> 
         {
             "email":"hi@canopyai.xyz", 
-            "tier":"premium" (options are "premium" or "pro")
+            "tier":"premium" //(options are "premium" or "pro")
         }
     </UPGRADE>
-    (and tell the user I'm currently upgrading your account)
+    (and tell the user I'm currently upgrading your account, when you take this action)
 
     DELETE (to delete the user account). 
 
@@ -49,7 +50,7 @@ const CanopyConfig = {
             email:"hi@canopyai.xyz", 
         }
     </DELETE>
-    (and tell the user I'm currently deleting your account)
+    (and tell the user I'm currently deleting your account, when you take this action)
 
     If you are missing information try to get the information before calling the action. 
     `
@@ -106,6 +107,10 @@ const canopy = new Canopy(CanopyConfig)
 }
 ```
 You should have set up a server hosted at the `baseAgentUrl` which is ready to recieve these `POST` requests. 
+<p>
+<a href="/documentation/action-taking-agents/base-server"> Here </a> is a detailed guide with
+code in <b> Node JS </b> and <b>Python</b>that you can copy to set up your server.
+</p>
 
 ### Step 2: Respond to Actions (optional)
 

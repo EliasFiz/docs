@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "Starter Kit",
+  "name": "Docs",
   "logo": {
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
@@ -23,13 +23,10 @@
   ],
   "topbarCtaButton": {
     "name": "Dashboard",
-    "url": "https://dashboard.mintlify.com"
+    "url": "https://canopyai.xyz/dashboard"
   },
   "tabs": [
-    {
-      "name": "API Reference",
-      "url": "api-reference"
-    }
+   
   ],
   "anchors": [
     {
@@ -39,35 +36,50 @@
     },
     {
       "name": "Community",
-      "icon": "slack",
+      "icon": "discord",
       "url": "https://mintlify.com/community"
-    },
-    {
-      "name": "Blog",
-      "icon": "newspaper",
-      "url": "https://mintlify.com/blog"
     }
   ],
   "navigation": [
     {
       "group": "Get Started",
-      "pages": ["introduction", "quickstart", "development"]
+      "pages": ["introduction", "quickstart"]
     },
-    {
-      "group": "Essentials",
-      "pages": ["essentials/markdown", "essentials/code", "essentials/images", "essentials/settings", "essentials/navigation"]
-    },
+
+
     {
       "group": "Documentation",
-      "pages": ["documentation/overview", "documentation/get-Started", "documentation/speech-and-Visual-Concepts",  "documentation/LLM-Concepts", "documentation/Action-Taking-Agents"]
+      "pages": ["documentation/overview",  "documentation/speech-and-Visual-Concepts",  "documentation/LLM-Concepts",
+       {
+        
+        "group":"Action Taking Agents", 
+        "pages":["/documentation/action-taking-agents/guide", "/documentation/action-taking-agents/system-message", "/documentation/action-taking-agents/base-server"]
+        }]
     },
   
     {
-      "group": "Endpoint Examples",
+      "group": "API Reference",
       "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
+        "api-reference/overview",
+        "api-reference/Canopy-Config",
+        {
+          "group":"Canopy", 
+          "pages":[
+            "api-reference/canopy/connect",
+            "api-reference/canopy/visualise",
+            "api-reference/canopy/listen",
+            "api-reference/canopy/close",
+            "api-reference/canopy/appendDialogue", 
+            "api-reference/canopy/readConversation",
+            "api-reference/canopy/deleteDialogue",
+            "api-reference/canopy/updateDialogue"
+
+
+
+          ]
+        }
+        
+
       ]
     }
   ],
