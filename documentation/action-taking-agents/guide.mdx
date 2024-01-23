@@ -6,75 +6,77 @@ anything that can be captured by an API call is a good foundation for an agent's
 Instructions for actions are embedded into the dialogues that the AI produces. We recommend you use `gpt-4-turbo` for agents that need to take actions. 
 
 <p>Lets work through a simple example.</p>
-<p> First lets come up with some simple actions that an agent could take. We are going to pretend that the agent can subscribe or delete users.</p>
+<p> First, let's come up with some simple actions that an agent could take. We are going to pretend that the agent can subscribe or delete users.</p>
 
-### Step 1: Initiate Actions with a System Message
+### Step 1: Define your Actions
 
-First we have to tell the LLM what actions they are allowed to take. Obviously, you can do this at any point in the conversation, but for simplicty, let's just do this in the 
-<a href="/documentation/action-taking-agents/system-message">`initialSystemMessage`</a>. You can learn about how to write a great system message for agentic behaviour <a href="/documentation/action-taking-agents/system-message">here</a>.
+First, we have to tell Canopy what actions they are allowed to take and some more information about each action. This is done by passing an object containing the agent's actions through  <a href="/api-reference/overview#step-3-get-authentication-token">`CanopyConfig`</a>.
 
 ```javascript
 const CanopyConfig = {
     model:"gpt-4-turbo", 
     ...
-    baseAgentUrl:'https://yourserver.com/canopy/', // the point of this will be explained shortly
-    initialSystemMessage:
-    `You are a bot to help users manage their account.
-    You can take actions when you deem appropriate
-    in the following format:
-    
-    <action_id>
-        {
-            required data as json
-        }
-    </action_id>
+    actionAgents: [
+      {
+        actionId: "UPGRADE",
+        description: "Upgrade the user account",
+        data: {
+          email: "The email of the user",
+          tier: "The tier to upgrade to (either pro or premium)",
+        },
+        endpoint: "https://yourserver.com/api/create",
+        method: "POST",
+      },
+      {
+        actionId: "DELETE",
+        description: "Delete the user account",
+        data: {
+          email: "The email of the user",
+        },
+        endpoint: "https://yourserver.com/api/delete",
+        method: "POST",
+      },
+      ...
+    ]
+};
 
-    You can take the following actions:
-
-    UPGRADE (to upgrade the user account). 
-
-    Call UPGRADE like this:
-    <UPGRADE> 
-        {
-            "email":"hi@canopyai.xyz", 
-            "tier":"premium" //(options are "premium" or "pro")
-        }
-    </UPGRADE>
-    (and tell the user I'm currently upgrading your account, when you take this action)
-
-    DELETE (to delete the user account). 
-
-    Call DELETE like this:
-    <DELETE>
-        {
-            email:"hi@canopyai.xyz", 
-        }
-    </DELETE>
-    (and tell the user I'm currently deleting your account, when you take this action)
-
-    If you are missing information try to get the information before calling the action. 
-    `
-}
-const canopy = new Canopy(CanopyConfig)
+const canopy = new Canopy(CanopyConfig);
 ```
 
-<p> Now that you have told the LLM what actions it can take. Let's imagine a conversation may go like:</p>
+#### Action Parameters
+<ParamField path="actionId" type="string" required="true">
+    The name used to identify this action. It should be one word and descriptive of the action.
+</ParamField>
+<ParamField path="description" type="string" required="true">
+    A short description of the action using natural language.
+</ParamField>
+<ParamField path="data" type="JSON" required="true">
+    The data that will be passed to the API endpoint. The content of each parameter should be a description of the data. You can also add additional information using natural language about the data (e.g. `tier: "The tier to upgrade the user to (either pro or premium)`).
+</ParamField>
+<ParamField path="endpoint" type="string" required="true">
+    The endpoint that the action will make a request to.
+</ParamField>
+<ParamField path="method" type="string" default="POST">
+    The type of HTTP request that will be sent from the endpoint.
+</ParamField>
+
+### Step 2: Agent initiates Actions
+
+<p> Now that you have told Canopy what actions it can take. Let's imagine a conversation may go like:</p>
 
 ```javascript
 [
-    //with the system message above somewhere prior in the conversation
-    ...
     {
-        role:"user", 
-        content:`hey I want to upgrade my account to premium`
+        role: "user", 
+        content: `Hey I want to upgrade my account to premium.`
     }, 
     {
-        role:"assistant", 
-        content:`Great! What is your email address?`
+        role: "assistant", 
+        content: `Great! What is your email address?`
     }, 
     {
         role:"user", 
-        content:`hi at canopy ai dot xyz`
+        content: `Hi at canopy ai dot xyz`
     }, 
     {
         role:"assistant", 
@@ -82,8 +84,8 @@ const canopy = new Canopy(CanopyConfig)
         Thanks. I'm upgrading your account now.
             <UPGRADE> 
                 {
-                    "email":"hi@canopyai.xyz", 
-                    "tier":"premium"
+                    "email": "hi@canopyai.xyz", 
+                    "tier":" premium"
                 }
             </UPGRADE> 
         `
@@ -92,27 +94,31 @@ const canopy = new Canopy(CanopyConfig)
 ]
 ```
 
-<p> At this point in the conversation, Canopy will parse the last dialogue and speak <em>Thanks. I'm upgrading your account now.</em></p>
-<p> It will simultaneously make a `POST` request to your `baseAgentUrl` (which you provided in `CanopyConfig`) with the json data provided in the `<ACTION>` object.</p>
+<p> At this point in the conversation, Canopy will parse the last dialogue and say <em>Thanks. I'm upgrading your account now.</em></p>
+<p> It will simultaneously call the endpoint with the information associated with that action object.</p>
 
 ```javascript
-//POST request sent to https://yourserver.com/canopy with data
+//POST request sent to https://yourserver.com/api/create with data:
 
 {
-    "actionType":"UPGRADE", 
-    "actionData":{
-        "email":"hi@canopyai.xyz", 
-        "tier":"premium"
-    }
+    "email": "hi@canopyai.xyz", 
+    "tier": "premium"
 }
 ```
-You should have set up a server hosted at the `baseAgentUrl` which is ready to recieve these `POST` requests. 
-<p>
-<a href="/documentation/action-taking-agents/base-server"> Here </a> is a detailed guide with
-code in <b> Node JS </b> and <b>Python</b>that you can copy to set up your server.
-</p>
+You should have set up a server hosted at the `endpoint` which is ready to recieve these requests.
 
-### Step 2: Respond to Actions (optional)
+#### Action response to client socket
+When the request to the endpoint has been completed, Canopy will send a response to the client socket in the following format:
+
+```json
+{
+    messageType: "actionAgentResponse",
+    success, // whether the HTTP request was successful
+    data // the data returned by the endpoint
+}
+```
+
+### Step 3: Respond to Actions (optional)
 
 You may optionally choose to respond to actions using the `CRUD` operations defined <a href="/documentation/llm-concepts">here</a>. For example, you may wish to tell the user they have insufficient credit to upgrade to premium. 
 In this case respond with JSON objects. 
