@@ -72,10 +72,8 @@
             "api-reference/canopy/appendDialogue", 
             "api-reference/canopy/readConversation",
             "api-reference/canopy/deleteDialogue",
-            "api-reference/canopy/updateDialogue"
-
-
-
+            "api-reference/canopy/updateDialogue",
+            "api-reference/canopy/messageThreadLength"
           ]
         }
         

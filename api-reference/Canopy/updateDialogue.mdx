@@ -5,21 +5,21 @@ title: 'canopy.updateDialogue'
 <RequestExample>
 
 ```javascript index.js
-await canopy.UpdateDialogue({
+await canopy.updateDialogue({
     role: "system",
-    content: "Here is information from the database:...", 
-    dialogueIndex:4 // the index in the message thread array of this dialogue
-})
+    content: "This is a new message.", 
+    dialogueIndex: 4
+});
 ```
 
 </RequestExample>
 
-Deletes a dialogue at a given `dialogueIndex` from the `messageThread`. More information 
+Updates a dialogue at a given `dialogueIndex` from the `messageThread`. More information 
 <a href="/documentation/LLM-Concepts#delete-dialogue"> here </a>.
 
 ### Parameters
 <ParamField path="dialogueIndex" type="number" required="true">
-`dialogueIndex` must be less than the length of the `messageThread` array.
+The index in the message thread array of the dialogue. Must be less than the length of the `messageThread` array.
 </ParamField>
 <ParamField path="role" type="string" required="true">
 More information <a href="/documentation/LLM-Concepts"> here </a>.

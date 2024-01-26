@@ -1,0 +1,23 @@
+---
+title: 'canopy.messageThreadLength'
+---
+
+<RequestExample>
+
+```javascript index.js
+await canopy.messageThreadLength();
+```
+
+</RequestExample>
+
+Returns the number of dialogues in the `messageThread`.
+
+### Response
+You will get a <b>JSON</b> response with the following fields:
+<ResponseField name="success" type="boolean">
+</ResponseField>
+<ResponseField name="timestamp" type="number">
+</ResponseField>
+<ResponseField name="messageThreadLength" type="number">
+The number of `dialogue` objects in the `messageThread`.
+</ResponseField>
