@@ -58,22 +58,22 @@
     },
   
     {
-      "group": "API Referenc",
+      "group": "API Reference",
       "pages": [
         "api-reference/overview",
         "api-reference/Canopy-Config",
         {
           "group":"Canopy", 
           "pages":[
-            "api-reference/canopy/connect",
-            "api-reference/canopy/visualise",
-            "api-reference/canopy/listen",
-            "api-reference/canopy/close",
-            "api-reference/canopy/appendDialogue", 
-            "api-reference/canopy/readConversation",
-            "api-reference/canopy/deleteDialogue",
-            "api-reference/canopy/updateDialogue",
-            "api-reference/canopy/messageThreadLength"
+            "api-reference/Canopy/connect",
+            "api-reference/Canopy/visualise",
+            "api-reference/Canopy/listen",
+            "api-reference/Canopy/close",
+            "api-reference/Canopy/appendDialogue", 
+            "api-reference/Canopy/readConversation",
+            "api-reference/Canopy/deleteDialogue",
+            "api-reference/Canopy/updateDialogue",
+            "api-reference/Canopy/messageThreadLength"
           ]
         }
         
