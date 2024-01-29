@@ -23,7 +23,7 @@
   ],
   "topbarCtaButton": {
     "name": "Dashboard",
-    "url": "https://canopyai.xyz/dashboard"
+    "url": "https://canopylabs.xyz/dashboard"
   },
   "tabs": [
    
@@ -49,7 +49,7 @@
 
     {
       "group": "Documentation",
-      "pages": ["documentation/overview",  "documentation/speech-and-visual-concepts",  "documentation/LLM-concepts",
+      "pages": ["documentation/overview",  "documentation/speech-and-visual-concepts",  "documentation/llm-concepts",
        {
         "group":"Action Taking Agents", 
         "pages":["documentation/action-taking-agents/guide", "documentation/action-taking-agents/system-message", "documentation/action-taking-agents/base-server"]
