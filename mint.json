@@ -49,11 +49,10 @@
 
     {
       "group": "Documentation",
-      "pages": ["documentation/overview",  "documentation/speech-and-Visual-Concepts",  "documentation/LLM-Concepts",
+      "pages": ["documentation/overview",  "documentation/speech-and-visual-concepts",  "documentation/LLM-concepts",
        {
-        
         "group":"Action Taking Agents", 
-        "pages":["/documentation/action-taking-agents/guide", "/documentation/action-taking-agents/system-message", "/documentation/action-taking-agents/base-server"]
+        "pages":["documentation/action-taking-agents/guide", "documentation/action-taking-agents/system-message", "documentation/action-taking-agents/base-server"]
         }]
     },
   
