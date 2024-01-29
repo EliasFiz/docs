@@ -1,0 +1,146 @@
+---
+title: 'Overview'
+---
+
+<Steps>
+  <Step title="Install Canopy">
+You need to import an instance of the Canopy Class into your project. 
+
+<CodeGroup>
+```HTML HTML Script Tag
+<!-- Paste this into the head of your html file -->
+<script src="https://unpkg.com/canopy/dist/canopy.min.js"></script>
+```
+```javascript ES6 Import Syntax
+import Canopy from 'https://unpkg.com/canopy/dist/canopy.min.js';
+
+```
+
+
+```bash NPM/React
+npm install canopyai
+```
+</CodeGroup>
+
+All the steps for Canopy as an HTML script tag are the same as that of the ES6
+</Step>
+<Step title="Import the Canopy Class">
+
+We should try logging the Canopy class to make sure it is properly imported.
+<CodeGroup>
+```javascript ES6 Syntax
+console.log(Canopy); 
+```
+
+
+</CodeGroup>
+
+</Step>
+
+
+
+<Step title="Get Authentication Token">
+
+Since you connect to Canopy from the client side, you will need to use a token to authenticate your requests from the server and pass these to the client.
+If you are unsure you can see <a href="/code-examples"> examples with different languages </a>. 
+You can get your token from the <a href="/dashboard">Dashboard</a> .
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://api.canopyai.xyz/get-auth-token?api_token=<apiToken>"
+```
+```javascript Node JS
+const rp = require('request-promise'); //npm install request-promise
+const apiToken = "<your-api-token>"; // from your dashboard
+const canopyAuthUrl = `https://auth.canopyai.xyz/api/v1/authenticate?api_token=${apiToken}`;
+
+const options = {
+    uri: canopyAuthUrl,
+    json: true // Automatically parses the JSON string in the response
+};
+
+async function getCanopyToken() {
+    const { authToken } = await rp.get(options)
+    return authToken;
+}
+
+//Usage
+getCanopyToken().then((token) => {
+    console.log(token);
+}).catch((err) => {
+    console.log(err);
+});
+```
+```python Python
+import requests #pip install requests
+
+api_token = "<your-api-token>"  # from your dashboard
+canopy_auth_url = f"https://auth.canopyai.xyz/api/v1/authenticate?api_token={api_token}"
+
+def get_canopy_token():
+    response = requests.get(canopy_auth_url)
+    response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
+    data = response.json()  # Parses the JSON response
+    return data['authToken']
+
+# Usage
+try:
+    token = get_canopy_token()
+    print("Token:", token)
+except requests.HTTPError as e:
+    print("An error occurred:", e)
+
+```
+</CodeGroup>
+
+</Step>
+
+
+<Step title="Initialise Canopy">
+
+In Step 2, we imported the Canopy class. Now we need to initialise it with the token we got from Step 3. Click for a full list of paremeters to 
+pass into  <a href="/api-reference/canopy-configuration">`CanopyConfig`</a>. In your `HTML` create an element with id `connect`.
+
+<Warning>Most browsers have a security feature that requires the user interact with the page before it can start listening for audio. 
+This means the `canopy.listen` method must be called in response to a browser event. </Warning>
+
+<CodeGroup>
+```javascript ES6 Syntax
+const CanopyConfig = {
+    authToken: "<your-token>"
+}
+const canopy  = new Canopy(CanopyConfig);
+
+const { success, error } = await canopy.connect();
+
+
+
+if(success) {
+    console.log("Connected to Canopy");
+} else {
+    console.log("Error connecting to Canopy", error);
+}
+
+document.getElementById("connect").addEventListener("click", async () => {
+  canopy.listen()
+});
+
+```
+</CodeGroup>
+</Step>
+<Step title ="Use and Close">
+See our quickstarts, API Reference, and documentation to be able to build agents or <a href="/documentation/llm-concepts#crud-conversations">`CRUD`</a>. to the `messageThread`. 
+Once you have access to the `canopy` instance, you have a whole range of functionality found  <a href="/documentation/llm-concepts#crud-conversations">here</a>.
+
+<p> Make sure to close Canopy when you are done using it. </p>
+
+<CodeGroup>
+```javascript ES6 Syntax
+canopy.close();
+```
+</CodeGroup>
+
+</Step>
+
+
+</Steps>

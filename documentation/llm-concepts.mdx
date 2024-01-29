@@ -1,0 +1,104 @@
+---
+title: Actions and LLM Concepts
+---
+## Overview
+Conversations consist of a `messageThread` which contains `dialogues`. They each have a `role` and `content` property.:
+
+| Term | Description                           |
+| -------- | ------------------------------------- |
+| Message Thread    | A list/array of objects that comprise the conversation; each object is a dialogue  |
+| Conversation    | Same as message thread  |
+| Dialogue      |  Each object is a Dialogue that has a role and a content property                  |
+| Role      |  Will be one of `user`, `assistant`, or `system`.              |
+| Content      |  A String representation of the conversation           |
+| Agent      |  A Canopy bot that can take actions         |
+
+
+
+### Models
+
+We current support the following models:
+| Model | Overview                           |
+| -------- | ------------------------------------- |
+| `gpt-3.5-turbo`     | Ultra low latency, not good for action calling or applications which require complex logic                   |
+| `gpt-4-turbo`     | ~ +300 ms of latency. Good for agent like behaviour and action calling                          |
+## CRUD  conversations
+You can run the CRUD operations: 
+| Operation ID | Description                           |
+| -------- | ------------------------------------- |
+| `ReadConversation`     | Sends the `messageThread` to the client  |
+| `AppendDialogue`     | Adds a `dialogue` to the `messageThread`|
+| `UpdateDialogue`     | Updates a `dialogue` in the `messageThread`|
+| `DeleteDialogue`     | Deletes a `dialogue` in the `messageThread`|
+### Read Conversation ###
+<p> You can submit the `ReadConversation` event which will return the entire `messageThread`.</p>
+
+```javascript
+const canopy  = new Canopy ({ ... }) 
+const { messageThread }  = await canopy.ReadConversation()
+```
+The response will be something like:
+```javascript
+{
+    success: true,
+    timestamp: 1623346800,
+    messageThread: [
+         {
+            role: "system",
+            content: "You are a friendly bot"
+        },
+        {
+            role: "user",
+            content: "Hello"
+        },
+        {
+            role: "assistant",
+            content: "Hi there!"
+        }
+        ...
+    ]
+}
+```
+You can use `ReadConversation` to get the entire message thread, and parse and do what you want with it.
+
+### Append Dialogue ###
+<p> You can submit the `AppendDialogue` event which will, add the dialogue you provide to the end of the `messageThread`, and return the entire `messageThread`.</p>
+
+```javascript
+const canopy  = new Canopy ({ ... }) 
+const { messageThread }  = await canopy.AppendDialogue({
+    role: "system",
+    content: "Here is information from the database:..."
+})
+```
+The response will be the message thread with the appended dialogue.
+You can use `AppendDialogue` to add a message to the conversation. For example,if you were retrieving data from a database you could pass it as information in a system message. 
+If you were 
+
+
+### Update Dialogue ###
+<p> You can submit the `UpdateDialogue` event which will return the entire message thread.</p>
+
+```javascript
+const canopy  = new Canopy ({ ... }) 
+const { messageThread }  = await canopy.UpdateDialogue({
+    role: "system",
+    content: "Here is information from the database:...", 
+    dialogueIndex:4 // the index in the message thread array of this dialogue
+})
+```
+The response will be the message thread with the appended dialogue.
+You can use `UpdateDialogue` to change a message in the conversation. For example, if you wanted to fill in information about the user in a system message as you learn it.
+
+### Delete Dialogue ###
+<p> You can submit the `DeleteDialogue` event which will return the entire message thread.</p>
+
+```javascript
+const canopy  = new Canopy ({ ... }) 
+const { messageThread }  = await canopy.DeleteDialogue({
+    dialogueIndex:4 // the index in the message thread array of this dialogue
+})
+```
+The response will be the message thread with the appended dialogue.
+
+
